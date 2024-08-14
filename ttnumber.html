@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Number Guessing Game</title>
+</head>
+<body>
+    <h1>Number Guessing Game</h1>
+    <p>Guess the 3-digit number:</p>
+    <input type="text" id="userGuess" maxlength="3">
+    <button onclick="checkGuess()">Submit Guess</button>
+
+    <p id="correctPlace"></p>
+    <p id="correctNumbers"></p>
+    <p id="result"></p>
+
+    <script>
+        // Generate a random three-digit number
+        let secretNumber = Math.floor(100 + Math.random() * 900).toString();
+        console.log("Secret number: " + secretNumber); // For debugging
+
+        function checkGuess() {
+            const userGuess = document.getElementById("userGuess").value;
+            if (userGuess.length !== 3 || isNaN(userGuess)) {
+                alert("Please enter a valid 3-digit number.");
+                return;
+            }
+
+            let correctPlace = 0;
+            let correctNumbers = 0;
+            const secretDigits = secretNumber.split('');
+            const userDigits = userGuess.split('');
+
+            // Check for correct numbers in the correct place
+            for (let i = 0; i < 3; i++) {
+                if (userDigits[i] === secretDigits[i]) {
+                    correctPlace++;
+                }
+            }
+
+            // Check for correct numbers in the sequence, regardless of place
+            correctNumbers = secretDigits.filter(digit => userDigits.includes(digit)).length;
+
+            // Display the results
+            document.getElementById("correctPlace").innerText = `Correct numbers in the correct place: ${correctPlace}`;
+            document.getElementById("correctNumbers").innerText = `Correct numbers total: ${correctNumbers}`;
+
+            // Check if the guess is correct
+            if (correctPlace === 3) {
+                document.getElementById("result").innerText = `Congratulations! You guessed the correct number: ${secretNumber}`;
+            } else {
+                document.getElementById("result").innerText = "Try again!";
+            }
+        }
+    </script>
+</body>
+</html>

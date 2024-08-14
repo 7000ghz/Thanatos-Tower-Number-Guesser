@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Number Guessing Helper</title>
+</head>
+<body>
+    <h1>Number Guessing Helper</h1>
+    <p>Initial guess: <strong id="currentGuess">789</strong></p>
+    <p>Provide the hints based on this guess:</p>
+    
+    <label for="correctPlace">Correct numbers in the correct place:</label>
+    <input type="number" id="correctPlace" min="0" max="3">
+    <br><br>
+    
+    <label for="correctNumbers">Correct numbers total:</label>
+    <input type="number" id="correctNumbers" min="0" max="3">
+    <br><br>
+    
+    <button onclick="processHint()">Submit Hints</button>
+    
+    <p id="result"></p>
+    <h3>Previous Guesses:</h3>
+    <ul id="guessList"></ul>
+
+    <script>
+        let possibleNumbers = generateAllThreeDigitNumbers();
+        let currentGuess = "789";
+        let previousGuesses = [];
+
+        function generateAllThreeDigitNumbers() {
+            let numbers = [];
+            for (let i = 100; i <= 999; i++) {
+                numbers.push(i.toString());
+            }
+            return numbers;
+        }
+
+        function processHint() {
+            const correctPlace = parseInt(document.getElementById("correctPlace").value);
+            const correctNumbers = parseInt(document.getElementById("correctNumbers").value);
+
+            // Save the current guess and hints to the previous guesses list
+            previousGuesses.push({ guess: currentGuess, correctPlace, correctNumbers });
+            displayPreviousGuesses();
+
+            // Filter the possible numbers based on the hints
+            possibleNumbers = possibleNumbers.filter(num => {
+                let correctPlaceCount = 0;
+                let correctNumbersCount = 0;
+                const numDigits = num.split('');
+                const guessDigits = currentGuess.split('');
+
+                for (let i = 0; i < 3; i++) {
+                    if (numDigits[i] === guessDigits[i]) {
+                        correctPlaceCount++;
+                    }
+                }
+
+                correctNumbersCount = numDigits.filter(digit => guessDigits.includes(digit)).length;
+
+                return correctPlaceCount === correctPlace && correctNumbersCount === correctNumbers;
+            });
+
+            if (possibleNumbers.length === 0) {
+                document.getElementById("result").innerText = "No possible numbers left based on these hints. Please check your inputs.";
+            } else if (possibleNumbers.length === 1) {
+                document.getElementById("result").innerText = `The correct number is: ${possibleNumbers[0]}`;
+            } else {
+                currentGuess = possibleNumbers[Math.floor(Math.random() * possibleNumbers.length)];
+                document.getElementById("currentGuess").innerText = currentGuess;
+                document.getElementById("result").innerText = `Next guess: ${currentGuess}`;
+            }
+        }
+
+        function displayPreviousGuesses() {
+            const guessList = document.getElementById("guessList");
+            guessList.innerHTML = "";
+            previousGuesses.forEach((entry, index) => {
+                const li = document.createElement("li");
+                li.textContent = `Guess ${index + 1}: ${entry.guess} - Correct Place: ${entry.correctPlace}, Correct Total: ${entry.correctNumbers}`;
+                guessList.appendChild(li);
+            });
+        }
+    </script>
+</body>
+</html>
